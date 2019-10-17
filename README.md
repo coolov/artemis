@@ -2,7 +2,7 @@
 
 experimental gql client
 
-# usage
+### usage
 
 ```javascript
 let client = createClient({
