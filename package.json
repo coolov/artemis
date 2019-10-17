@@ -1,0 +1,35 @@
+{
+  "name": "artemis",
+  "version": "0.0.1",
+  "description": "experimental gql client",
+  "main": "src/runtime/index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nytimes/artemis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nytimes/artemis/issues"
+  },
+  "homepage": "https://github.com/nytimes/artemis#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "jest": "^24.9.0"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env"
+      ]
+    ]
+  }
+}
