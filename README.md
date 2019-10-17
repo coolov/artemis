@@ -5,6 +5,14 @@ experimental gql client
 ### usage
 
 ```javascript
+import {
+  createClient,
+  gql,
+  createLink,
+  useQuery,
+  ArtemisProvider
+} from 'artemis';
+
 let client = createClient({
   link: createLink({ uri: "http://my-awesom-server.com/graphql" })
 });
