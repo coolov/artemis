@@ -1,35 +1,42 @@
 {
   "name": "artemis",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "experimental gql client",
-  "main": "src/runtime/index.js",
+  "module": "src/runtime/index.js",
   "directories": {
     "example": "examples"
   },
   "scripts": {
-    "test": "jest --watch"
+    "test": "npx jest --watch"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nytimes/artemis.git"
+    "url": "git+https://github.com/coolov/artemis.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nytimes/artemis/issues"
+    "url": "https://github.com/coolov/artemis/issues"
   },
-  "homepage": "https://github.com/nytimes/artemis#readme",
+  "homepage": "https://github.com/coolov/artemis#readme",
   "devDependencies": {
     "@babel/cli": "^7.6.4",
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
-    "jest": "^24.9.0"
+    "@babel/preset-react": "^7.6.3",
+    "enzyme": "^3.10.0",
+    "enzyme-adapter-react-16": "^1.15.1",
+    "jest": "^24.9.0",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "react-test-renderer": "^16.10.2",
+    "react-testing-library": "^8.0.1"
   },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env"
-      ]
-    ]
+  "dependencies": {
+    "zen-observable": "^0.8.14"
+  },
+  "peerDependencies": {
+    "react": "16.8",
+    "react-dom": "16.8"
   }
 }

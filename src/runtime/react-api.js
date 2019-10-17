@@ -7,7 +7,8 @@ import React, {
   useContext,
   useState,
   useEffect,
-  useReducer
+  useReducer,
+  useMemo
 } from "react";
 
 import { shallowCompare } from "./util";
@@ -16,10 +17,12 @@ const ArtemisContext = createContext();
 
 export function ArtemisProvider(props) {
   const { client } = props;
-  return (
-    <ArtemisContext.Provider value={client}>
-      {props.children}
-    </ArtemisContext.Provider>
+  return React.createElement(
+    ArtemisContext.Provider,
+    {
+      value: client
+    },
+    props.children
   );
 }
 
@@ -86,8 +89,12 @@ export function useQuery(query, opts = { variables: {} }) {
     setPrevVars(opts.variables);
   }
 
+  const op = useMemo(() => client.createOperation({ query, variables }), [
+    query,
+    variables
+  ]);
+
   // first hit the cache (runs on init and on state change)
-  const op = client.createOperation({ query, variables });
   const initialCacheHit = client.store.get(op);
   const hasData = !!initialCacheHit;
   const isDeferred = false;

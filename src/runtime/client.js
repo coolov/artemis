@@ -31,11 +31,12 @@ export function createClient({ link, initialState, ssrMode = false }) {
     execute,
     store,
     ssrMode,
-    load: async op => {
-      const res = await link.executePromise(op);
-      if (res.data) {
-        store.set(op, res.data);
-      }
+    load: op => {
+      return link.executePromise(op).then(res => {
+        if (res.data) {
+          store.set(op, res.data);
+        }
+      });
     },
     createOperation({ query, variables = {} }) {
       // query is coming from a gql tag

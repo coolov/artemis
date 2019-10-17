@@ -22,7 +22,7 @@ export function graphql(query, config = {}) {
       // for now, return early on mutations
       // todo: implement them!!!
       if (client.createOperation({ query }).type === "mutation") {
-        return <ComposedComponent {...props} />;
+        return React.createElement(ComposedComponent, props);
       }
 
       if (client.ssrMode && !options.ssr) {
@@ -31,12 +31,10 @@ export function graphql(query, config = {}) {
 
       const { data, loading, error } = useQuery(query, options);
 
-      return (
-        <ComposedComponent
-          {...props}
-          data={{ loading, error, ...(data || {}) }}
-        />
-      );
+      return React.createElement({
+        ...props,
+        data: { loading, error, ...(data || {}) }
+      });
     };
   };
 }
@@ -53,7 +51,7 @@ export function withApollo(ComposedComponent) {
       throw new Error("Fail!");
     }
   };
-  return props => <ComposedComponent {...props} client={client} />;
+  return props => React.createElement({ ...props, client });
 }
 
 // render props api ugh!!!
