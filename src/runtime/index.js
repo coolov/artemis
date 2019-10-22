@@ -32,4 +32,4 @@ export { executor } from "./link";
  * for the dustbin of history:
  * hoc, render-props, decorator
  */
-export { withApollo, Query, compose } from "./react-api-legacy";
+export { withApollo, Query, compose, graphql } from "./react-api-legacy";

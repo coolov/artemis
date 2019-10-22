@@ -29,11 +29,11 @@ export function graphql(query, config = {}) {
         return null;
       }
 
-      const { data, loading, error } = useQuery(query, options);
+      const { data, loading, error, refetch } = useQuery(query, options);
 
-      return React.createElement({
+      return React.createElement(ComposedComponent, {
         ...props,
-        data: { loading, error, ...(data || {}) }
+        data: { loading, error, refetch, ...(data || {}) }
       });
     };
   };

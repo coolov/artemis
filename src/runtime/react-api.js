@@ -104,7 +104,7 @@ export function useQuery(query, opts = { variables: {} }) {
     // default loading state to true if there is no initial cache
     // hit and if the query is not defered
     loading: isDeferred ? false : !initialCacheHit,
-    isError: false
+    error: false
   });
 
   useEffect(() => {

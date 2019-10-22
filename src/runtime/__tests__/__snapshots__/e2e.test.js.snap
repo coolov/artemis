@@ -1,0 +1,98 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Fetches data & re-fetches data using legacy hoc 1`] = `
+Array [
+  Array [
+    Object {
+      "kind": "String",
+      "name": "ArticleQuery",
+      "query": "
+  query ArticleQuery($articleId: String!) {
+    anyWork(id: $articleId) {
+      headline
+    }
+  }
+",
+      "type": "query",
+      "variables": Object {},
+    },
+  ],
+]
+`;
+
+exports[`Fetches data & re-fetches data using legacy hoc 2`] = `
+Array [
+  Array [
+    Object {
+      "data": Object {
+        "error": false,
+        "loading": true,
+        "refetch": [Function],
+      },
+    },
+  ],
+  Array [
+    Object {
+      "data": Object {
+        "anyWork": Object {
+          "headline": undefined,
+        },
+        "error": false,
+        "loading": false,
+        "refetch": [Function],
+      },
+    },
+  ],
+]
+`;
+
+exports[`Fetches data & re-fetches data using legacy hoc 3`] = `
+Array [
+  Array [
+    Object {
+      "kind": "String",
+      "name": "ArticleQuery",
+      "query": "
+  query ArticleQuery($articleId: String!) {
+    anyWork(id: $articleId) {
+      headline
+    }
+  }
+",
+      "type": "query",
+      "variables": Object {
+        "articleId": "hello",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Fetches data & re-fetches data using legacy hoc 4`] = `
+Array [
+  Array [
+    Object {
+      "data": Object {
+        "anyWork": Object {
+          "headline": undefined,
+        },
+        "error": false,
+        "loading": false,
+        "refetch": [Function],
+      },
+    },
+  ],
+  Array [
+    Object {
+      "data": Object {
+        "anyWork": Object {
+          "headline": "hello",
+        },
+        "error": false,
+        "loading": false,
+        "refetch": [Function],
+      },
+    },
+  ],
+]
+`;

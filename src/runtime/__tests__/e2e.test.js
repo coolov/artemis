@@ -1,5 +1,12 @@
 import React from "react";
-import { createClient, gql, createLink, useQuery, ArtemisProvider } from "../";
+import {
+  createClient,
+  gql,
+  createLink,
+  useQuery,
+  ArtemisProvider,
+  graphql
+} from "../";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 import { exportAllDeclaration } from "@babel/types";
@@ -43,7 +50,7 @@ afterEach(() => {
   container = null;
 });
 
-it("Fetches data + re-fetches data", () => {
+it("Fetches data & re-fetches data using hooks api", () => {
   let renderCounter = jest.fn();
   let executeSpy = jest.fn();
 
@@ -93,11 +100,11 @@ it("Fetches data + re-fetches data", () => {
   expect(renderCounter.mock.calls.length).toBe(2);
   expect(document.querySelector("#headline").textContent).toBe("hola");
 
-  const button = document.querySelector("#button");
-
   // refetch
   act(() => {
-    button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    document
+      .querySelector("#button")
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
   });
 
   const op2 = executeSpy.mock.calls[1][0];
@@ -105,4 +112,54 @@ it("Fetches data + re-fetches data", () => {
   expect(op2.variables.articleId).toBe("hello");
   expect(renderCounter.mock.calls.length).toBe(4);
   expect(document.querySelector("#headline").textContent).toBe("hello");
+});
+
+it("Fetches data & re-fetches data using legacy hoc", () => {
+  let renderCounter = jest.fn();
+  let executeSpy = jest.fn();
+
+  let client = createClient({ link: link(executeSpy) });
+
+  const Component = props => {
+    renderCounter(props);
+
+    if (props.loading) {
+      return <b>Loading</b>;
+    }
+
+    return (
+      <button
+        onClick={() => {
+          props.data.refetch({ articleId: "hello" });
+        }}
+        id="button"
+      ></button>
+    );
+  };
+
+  const App = graphql(q, { variables: { articleId: "hola" } })(Component);
+
+  act(() => {
+    render(
+      <ArtemisProvider client={client}>
+        <App />
+      </ArtemisProvider>,
+      container
+    );
+  });
+
+  expect(executeSpy.mock.calls).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
+
+  // refetch
+  executeSpy.mockClear();
+  renderCounter.mockClear();
+  act(() => {
+    document
+      .querySelector("#button")
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+
+  expect(executeSpy.mock.calls).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
 });
