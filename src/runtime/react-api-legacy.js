@@ -22,7 +22,10 @@ export function graphql(query, config = {}) {
       // for now, return early on mutations
       // todo: implement them!!!
       if (client.createOperation({ query }).type === "mutation") {
-        return React.createElement(ComposedComponent, props);
+        return React.createElement(ComposedComponent, {
+          ...props,
+          mutate: () => {}
+        });
       }
 
       if (client.ssrMode && !options.ssr) {

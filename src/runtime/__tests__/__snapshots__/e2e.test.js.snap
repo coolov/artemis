@@ -96,3 +96,15 @@ Array [
   ],
 ]
 `;
+
+exports[`mutates data using legacy hoc 1`] = `Array []`;
+
+exports[`mutates data using legacy hoc 2`] = `
+Array [
+  Array [
+    Object {
+      "mutate": [Function],
+    },
+  ],
+]
+`;

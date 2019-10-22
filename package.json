@@ -7,7 +7,8 @@
     "example": "examples"
   },
   "scripts": {
-    "test": "npx jest --watch"
+    "test": "npx jest --watch",
+    "build": "rollup -c"
   },
   "repository": {
     "type": "git",
@@ -24,15 +25,13 @@
     "@babel/core": "^7.6.4",
     "@babel/preset-env": "^7.6.3",
     "@babel/preset-react": "^7.6.3",
-    "enzyme": "^3.10.0",
-    "enzyme-adapter-react-16": "^1.15.1",
     "jest": "^24.9.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
-    "react-test-renderer": "^16.10.2",
-    "react-testing-library": "^8.0.1"
+    "rollup": "^1.25.1"
   },
   "dependencies": {
+    "rollup-plugin-terser": "^5.1.2",
     "zen-observable": "^0.8.14"
   },
   "peerDependencies": {

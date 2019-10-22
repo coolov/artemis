@@ -36,6 +36,13 @@ let q = gql`
   }
 `;
 
+let mutation = gql`
+  mutation ArticleMutation($articleId) {
+    anywork {
+      headline
+    }
+`;
+
 let container = null;
 beforeEach(() => {
   // setup a DOM element as a render target
@@ -129,11 +136,9 @@ it("Fetches data & re-fetches data using legacy hoc", () => {
 
     return (
       <button
-        onClick={() => {
-          props.data.refetch({ articleId: "hello" });
-        }}
+        onClick={() => props.data.refetch({ articleId: "hello" })}
         id="button"
-      ></button>
+      />
     );
   };
 
@@ -158,6 +163,44 @@ it("Fetches data & re-fetches data using legacy hoc", () => {
     document
       .querySelector("#button")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+
+  expect(executeSpy.mock.calls).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
+});
+
+it("mutates data using legacy hoc", () => {
+  let renderCounter = jest.fn();
+  let executeSpy = jest.fn();
+
+  let client = createClient({ link: link(executeSpy) });
+
+  const Component = props => {
+    renderCounter(props);
+
+    if (props.loading) {
+      return <b>Loading</b>;
+    }
+
+    return (
+      <button
+        onClick={() => props.data.refetch({ articleId: "hello" })}
+        id="button"
+      />
+    );
+  };
+
+  const App = graphql(mutation, { variables: { articleId: "hola" } })(
+    Component
+  );
+
+  act(() => {
+    render(
+      <ArtemisProvider client={client}>
+        <App />
+      </ArtemisProvider>,
+      container
+    );
   });
 
   expect(executeSpy.mock.calls).toMatchSnapshot();
