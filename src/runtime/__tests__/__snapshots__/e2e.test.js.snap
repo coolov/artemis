@@ -97,6 +97,116 @@ Array [
 ]
 `;
 
+exports[`Fetches data & re-fetches data using the render props api 1`] = `
+Array [
+  Array [
+    Object {
+      "kind": "String",
+      "name": "ArticleQuery",
+      "query": "
+  query ArticleQuery($articleId: String!) {
+    anyWork(id: $articleId) {
+      headline
+    }
+  }
+",
+      "type": "query",
+      "variables": Object {
+        "articleId": "hola",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Fetches data & re-fetches data using the render props api 2`] = `
+Array [
+  Array [
+    Object {
+      "data": null,
+      "error": false,
+      "loading": true,
+      "refetch": [Function],
+      "variables": Object {
+        "articleId": "hola",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "data": Object {
+        "anyWork": Object {
+          "headline": "hola",
+        },
+      },
+      "error": false,
+      "loading": false,
+      "refetch": [Function],
+      "variables": Object {
+        "articleId": "hola",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Fetches data & re-fetches data using the render props api 3`] = `
+Array [
+  Array [
+    Object {
+      "kind": "String",
+      "name": "ArticleQuery",
+      "query": "
+  query ArticleQuery($articleId: String!) {
+    anyWork(id: $articleId) {
+      headline
+    }
+  }
+",
+      "type": "query",
+      "variables": Object {
+        "articleId": "hello",
+      },
+    },
+  ],
+]
+`;
+
+exports[`Fetches data & re-fetches data using the render props api 4`] = `
+Array [
+  Array [
+    Object {
+      "data": Object {
+        "anyWork": Object {
+          "headline": "hola",
+        },
+      },
+      "error": false,
+      "loading": false,
+      "refetch": [Function],
+      "variables": Object {
+        "articleId": "hello",
+      },
+    },
+  ],
+  Array [
+    Object {
+      "data": Object {
+        "anyWork": Object {
+          "headline": "hello",
+        },
+      },
+      "error": false,
+      "loading": false,
+      "refetch": [Function],
+      "variables": Object {
+        "articleId": "hello",
+      },
+    },
+  ],
+]
+`;
+
 exports[`mutates data using legacy hoc 1`] = `Array []`;
 
 exports[`mutates data using legacy hoc 2`] = `

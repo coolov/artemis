@@ -58,11 +58,7 @@ export function withApollo(ComposedComponent) {
 }
 
 // render props api ugh!!!
-export function Query(props) {
-  const loading = true;
-  const error = null;
-  const data = null;
-  const res = props.children(loading, error, data);
-  console.log("res:", res);
-  return null;
+// <Query query={GET_DOGS}>{({ loading, error, data }) => { return <MyComponent/> }}</Query>
+export function Query({ query, variables, children }) {
+  return children(useQuery(query, { variables }));
 }

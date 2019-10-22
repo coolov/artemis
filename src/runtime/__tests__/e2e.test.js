@@ -5,7 +5,8 @@ import {
   createLink,
   useQuery,
   ArtemisProvider,
-  graphql
+  graphql,
+  Query
 } from "../";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
@@ -143,6 +144,53 @@ it("Fetches data & re-fetches data using legacy hoc", () => {
   };
 
   const App = graphql(q, { variables: { articleId: "hola" } })(Component);
+
+  act(() => {
+    render(
+      <ArtemisProvider client={client}>
+        <App />
+      </ArtemisProvider>,
+      container
+    );
+  });
+
+  expect(executeSpy.mock.calls).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
+
+  // refetch
+  executeSpy.mockClear();
+  renderCounter.mockClear();
+  act(() => {
+    document
+      .querySelector("#button")
+      .dispatchEvent(new MouseEvent("click", { bubbles: true }));
+  });
+
+  expect(executeSpy.mock.calls).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
+});
+
+it("Fetches data & re-fetches data using the render props api", () => {
+  let renderCounter = jest.fn();
+  let executeSpy = jest.fn();
+
+  let client = createClient({ link: link(executeSpy) });
+
+  const App = props => {
+    return (
+      <Query query={q} variables={{ articleId: "hola" }}>
+        {props => {
+          renderCounter(props);
+          return (
+            <button
+              onClick={() => props.refetch({ articleId: "hello" })}
+              id="button"
+            />
+          );
+        }}
+      </Query>
+    );
+  };
 
   act(() => {
     render(
