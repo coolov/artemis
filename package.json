@@ -1,6 +1,6 @@
 {
   "name": "artemis",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "experimental gql client",
   "module": "src/runtime/index.js",
   "scripts": {
