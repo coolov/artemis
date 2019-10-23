@@ -69,7 +69,7 @@ it("Fetches data & re-fetches data using hooks api", () => {
       variables: { articleId: "hola" }
     });
 
-    renderCounter();
+    renderCounter({ data, loading, refetch });
 
     if (loading) {
       return <b>Loading</b>;
@@ -97,28 +97,22 @@ it("Fetches data & re-fetches data using hooks api", () => {
     );
   });
 
-  const op = executeSpy.mock.calls[0][0];
-
   // initial fetch
-  expect(executeSpy.mock.calls.length).toBe(1);
-  expect(op.name).toBe("ArticleQuery");
-  expect(op.type).toBe("query");
-  expect(op.kind).toBe("String");
-  expect(op.variables.articleId).toBe("hola");
-  expect(renderCounter.mock.calls.length).toBe(2);
+  expect(executeSpy.mock.calls).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
   expect(document.querySelector("#headline").textContent).toBe("hola");
 
   // refetch
+  executeSpy.mockClear();
+  renderCounter.mockClear();
   act(() => {
     document
       .querySelector("#button")
       .dispatchEvent(new MouseEvent("click", { bubbles: true }));
   });
 
-  const op2 = executeSpy.mock.calls[1][0];
-  expect(executeSpy.mock.calls.length).toBe(2);
-  expect(op2.variables.articleId).toBe("hello");
-  expect(renderCounter.mock.calls.length).toBe(4);
+  expect(executeSpy.mock.calls).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
   expect(document.querySelector("#headline").textContent).toBe("hello");
 });
 
@@ -254,3 +248,5 @@ it("mutates data using legacy hoc", () => {
   expect(executeSpy.mock.calls).toMatchSnapshot();
   expect(renderCounter.mock.calls).toMatchSnapshot();
 });
+
+// TODO: ADD A REFETCH THAT HITS THE CACHE!

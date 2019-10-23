@@ -8,7 +8,8 @@ import React, {
   useState,
   useEffect,
   useReducer,
-  useMemo
+  useMemo,
+  useRef
 } from "react";
 
 import { shallowCompare } from "./util";
@@ -35,15 +36,8 @@ export function useArtemisClient() {
 // https://github.com/the-road-to-learn-react/use-data-api/blob/master/src/index.js
 function dataFetchReducer(state, action) {
   switch (action.type) {
-    case "SET_VARIABLES":
-      return {
-        ...state,
-        loading: true,
-        error: false,
-        variables: action.payload
-      };
     case "FETCH_INIT":
-      return { ...state, loading: true, error: false };
+      return { ...state, loading: action.payload, error: false };
     case "FETCH_SUCCESS":
       return {
         ...state,
@@ -78,12 +72,19 @@ function dataFetchReducer(state, action) {
 // returns:
 // { data, loading, error, variables, networkStatus, refetch, fetchMore, updateQuery }
 export function useQuery(query, opts = { variables: {} }) {
+  // todo, assert in tests that ignoring variables doesn't blow up the test
+  opts.variables = opts.variables || {};
+
   const client = useArtemisClient();
   const [variables, setVariables] = useState(opts.variables);
+
+  // use to hold an `update data` function provided by `fetchMore`
+  const updateQueryRef = useRef(null);
 
   // derived state from props
   // https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
   const [prevVars, setPrevVars] = useState(opts.variables);
+
   if (!shallowCompare(opts.variables, prevVars)) {
     setVariables(opts.variables);
     setPrevVars(opts.variables);
@@ -108,14 +109,26 @@ export function useQuery(query, opts = { variables: {} }) {
   });
 
   useEffect(() => {
+    const isUpdate = typeof updateQueryRef.current === "function";
+
     // immdiately start loading the query if it's not in cache
     if (!hasData) {
-      dispatch({ type: "FETCH_INIT" });
+      dispatch({ type: "FETCH_INIT", payload: !isUpdate }); // < --- payload here is a true false value, clean this up
 
       const sub = client.execute(op).subscribe({
         next: result => {
           client.store.set(op, result.data);
-          dispatch({ type: "FETCH_SUCCESS", payload: result.data });
+
+          // if it's availible, use the updateQuery function from `fetchMore`
+          // to merge in more data
+          const payload = isUpdate
+            ? updateQueryRef.current(state.data, {
+                fetchMoreResult: result.data
+              })
+            : result.data;
+
+          updateQueryRef.current = null;
+          dispatch({ type: "FETCH_SUCCESS", payload });
         },
         error: error => {
           dispatch({ type: "FETCH_FAILURE" });
@@ -129,7 +142,15 @@ export function useQuery(query, opts = { variables: {} }) {
   }, [client, op, hasData]);
 
   // what happens after set variables?
-  return { ...state, refetch: setVariables, variables };
+  return {
+    ...state,
+    refetch: setVariables,
+    variables,
+    fetchMore: ({ variables, updateQuery }) => {
+      setVariables(variables);
+      updateQueryRef.current = updateQuery;
+    }
+  };
 }
 
 export function useMutation(query, opts) {}

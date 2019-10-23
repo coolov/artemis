@@ -1,6 +1,7 @@
 import Observable from "zen-observable";
 
 async function fetchJSON(url, opts) {
+  opts.headers["Content-Type"] = "application/json";
   let res = await fetch(url, opts);
   return res.json();
 }

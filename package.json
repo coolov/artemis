@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "description": "experimental gql client",
   "module": "src/runtime/index.js",
-  "directories": {
-    "example": "examples"
-  },
   "scripts": {
     "test": "npx jest --watch",
     "build": "rollup -c"
