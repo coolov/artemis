@@ -1,0 +1,42 @@
+{
+  "name": "artemis",
+  "version": "0.0.2",
+  "description": "experimental gql client",
+  "module": "dist/lib.esm.js",
+  "main": "dist/lib.cjs.js",
+  "files": [
+    "dist/*"
+  ],
+  "scripts": {
+    "test": "npx jest --watch",
+    "build": "rollup -c"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/coolov/artemis.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/coolov/artemis/issues"
+  },
+  "homepage": "https://github.com/coolov/artemis#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.6.4",
+    "@babel/core": "^7.6.4",
+    "@babel/preset-env": "^7.6.3",
+    "@babel/preset-react": "^7.6.3",
+    "jest": "^24.9.0",
+    "react": "^16.10.2",
+    "react-dom": "^16.10.2",
+    "rollup": "^1.25.1",
+    "rollup-plugin-terser": "^5.1.2"
+  },
+  "dependencies": {
+    "zen-observable": "^0.8.14"
+  },
+  "peerDependencies": {
+    "react": "16.8",
+    "react-dom": "16.8"
+  }
+}
