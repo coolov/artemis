@@ -23,6 +23,32 @@ export function createStore(initialState) {
   };
 }
 
+function createOperation({ query, variables = {} }) {
+  // query is coming from a gql tag
+  if (query.kind === "Document") {
+    return {
+      name: query.definitions[0].name.value,
+      type: query.definitions[0].operation,
+      kind: query.kind,
+      query,
+      variables
+    };
+  }
+
+  // query is coming from an artemis tag
+  if (query.kind === "String") {
+    return {
+      name: query.name,
+      type: query.type,
+      kind: query.kind,
+      query: query.query,
+      variables
+    };
+  }
+
+  throw new TypeError("Unknown Query!");
+}
+
 export function createClient({ link, initialState, ssrMode = false }) {
   const store = createStore(initialState);
   const { execute } = link;
@@ -31,37 +57,14 @@ export function createClient({ link, initialState, ssrMode = false }) {
     execute,
     store,
     ssrMode,
-    load: op => {
+    load: ({ query, variables }) => {
+      const op = createOperation({ query, variables });
       return link.executePromise(op).then(res => {
         if (res.data) {
           store.set(op, res.data);
         }
       });
     },
-    createOperation({ query, variables = {} }) {
-      // query is coming from a gql tag
-      if (query.kind === "Document") {
-        return {
-          name: query.definitions[0].name.value,
-          type: query.definitions[0].operation,
-          kind: query.kind,
-          query,
-          variables
-        };
-      }
-
-      // query is coming from an artemis tag
-      if (query.kind === "String") {
-        return {
-          name: query.name,
-          type: query.type,
-          kind: query.kind,
-          query: query.query,
-          variables
-        };
-      }
-
-      throw new TypeError("Unknown Query!");
-    }
+    createOperation
   };
 }

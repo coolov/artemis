@@ -9,12 +9,17 @@ export function parseQuery(str) {
 // this is to flatten the nested fragments
 // todo: optimize this
 // https://medium.com/dailyjs/functional-js-with-es6-recursive-patterns-b7d0813ef9e3
-const flatten = ([x, ...xs]) =>
-  typeof x !== "undefined"
-    ? Array.isArray(x)
-      ? [...flatten(x), ...flatten(xs)]
-      : [x, ...flatten(xs)]
-    : [];
+function flatten([x, ...xs]) {
+  if (typeof x === "undefined") {
+    return [];
+  }
+
+  if (Array.isArray(x)) {
+    return [...flatten(x), ...flatten(xs)];
+  }
+
+  return [x, ...flatten(xs)];
+}
 
 export function gql(strings, ...values) {
   let literal = strings[0];
