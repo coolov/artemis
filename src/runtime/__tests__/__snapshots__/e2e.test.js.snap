@@ -12,7 +12,7 @@ Array [
       headline
     }
   }
-",
+ ",
       "type": "query",
       "variables": Object {
         "articleId": "hola",
@@ -57,7 +57,7 @@ Array [
       headline
     }
   }
-",
+ ",
       "type": "query",
       "variables": Object {
         "articleId": "hello",
@@ -106,7 +106,7 @@ Array [
       headline
     }
   }
-",
+ ",
       "type": "query",
       "variables": Object {},
     },
@@ -152,7 +152,7 @@ Array [
       headline
     }
   }
-",
+ ",
       "type": "query",
       "variables": Object {
         "articleId": "hello",
@@ -203,7 +203,7 @@ Array [
       headline
     }
   }
-",
+ ",
       "type": "query",
       "variables": Object {
         "articleId": "hola",
@@ -258,7 +258,7 @@ Array [
       headline
     }
   }
-",
+ ",
       "type": "query",
       "variables": Object {
         "articleId": "hello",

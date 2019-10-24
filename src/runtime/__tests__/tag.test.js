@@ -18,15 +18,28 @@ it("turns a query into an object", () => {
       coolSchool
     }
   `;
+
+  const dupeFragment = gql`
+    fragment CoolerFragment {
+      ...CoolFragment
+    }
+    ${fragment}
+  `;
+
   const query = gql`
     query Arrrgh {
       ...CoolFragment
+      ...CoolerFragment
     }
 
     ${fragment}
+    ${dupeFragment}
   `;
 
   expect(query.name).toEqual("Arrrgh");
   expect(query.type).toEqual("query");
   expect(query.kind).toEqual("String");
+
+  // it should dedupde fragments
+  expect(query.query.match(/fragment CoolFragment/g).length).toEqual(1);
 });
