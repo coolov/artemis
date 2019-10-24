@@ -1,6 +1,6 @@
 {
   "name": "artemis",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "experimental gql client",
   "module": "dist/lib.esm.js",
   "main": "dist/lib.cjs.js",
