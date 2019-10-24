@@ -17,8 +17,8 @@ let client = createClient({
   link: createLink({ uri: "http://my-awesom-server.com/graphql" })
 });
 let query = gql`
-  query ArticleQuery($articleId: String!) {
-    anyWork(id: $articleId) {
+  query Article($articleId: String!) {
+    article(id: $articleId) {
       headline
     }
   }
@@ -33,7 +33,7 @@ let Story = () => {
     return <div>Loading</div>;
   }
 
-  return <data>{data.anyWork.headline}</div>
+  return <data>{data.article.headline}</div>
 };
 
 let App = <ArtemisProvider client={client}></ArtemisProvider>;
