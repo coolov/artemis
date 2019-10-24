@@ -24,7 +24,7 @@ let query = gql`
   }
 `;
 
-let Story = () => {
+let Article = () => {
   let { data, loading, refetch } = useQuery(q, {
     variables: { articleId: "12388277" }
   });
