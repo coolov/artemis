@@ -1,8 +1,12 @@
 {
   "name": "artemis",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "experimental gql client",
-  "module": "src/runtime/index.js",
+  "module": "dist/lib.esm.js",
+  "main": "dist/lib.cjs.js",
+  "files": [
+    "dist/*"
+  ],
   "scripts": {
     "test": "npx jest --watch",
     "build": "rollup -c"
@@ -25,10 +29,10 @@
     "jest": "^24.9.0",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
-    "rollup": "^1.25.1"
+    "rollup": "^1.25.1",
+    "rollup-plugin-terser": "^5.1.2"
   },
   "dependencies": {
-    "rollup-plugin-terser": "^5.1.2",
     "zen-observable": "^0.8.14"
   },
   "peerDependencies": {
