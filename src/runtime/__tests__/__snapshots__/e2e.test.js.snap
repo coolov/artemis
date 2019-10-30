@@ -325,6 +325,29 @@ Array [
 ]
 `;
 
+exports[`Renders to string using hooks api 1`] = `"<div><h1 id=\\"headline\\">hola</h1> <button id=\\"button\\"></button></div>"`;
+
+exports[`Renders to string using hooks api 2`] = `
+Array [
+  Array [
+    Object {
+      "data": Object {
+        "anyWork": Object {
+          "headline": "hola",
+        },
+      },
+      "error": false,
+      "fetchMore": [Function],
+      "loading": false,
+      "refetch": [Function],
+      "variables": Object {
+        "articleId": "hola",
+      },
+    },
+  ],
+]
+`;
+
 exports[`mutates data using legacy hoc 1`] = `Array []`;
 
 exports[`mutates data using legacy hoc 2`] = `

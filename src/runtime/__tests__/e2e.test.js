@@ -9,10 +9,19 @@ import {
   Query
 } from "../";
 import { render, unmountComponentAtNode } from "react-dom";
+import ReactDOMServer from "react-dom/server";
+
 import { act } from "react-dom/test-utils";
 import { exportAllDeclaration } from "@babel/types";
 
 // mock link
+const response = op => ({
+  data: {
+    anyWork: {
+      headline: op.variables.articleId
+    }
+  }
+});
 const link = fn => {
   return {
     // observable based api
@@ -20,11 +29,12 @@ const link = fn => {
       return {
         subscribe(api) {
           fn(op);
-          api.next({ data: { anyWork: { headline: op.variables.articleId } } });
+          api.next(response(op));
           return { unsubscribe: () => {} };
         }
       };
-    }
+    },
+    executePromise: op => Promise.resolve(response(op))
   };
 };
 
@@ -50,8 +60,6 @@ function ButtonAndHeadline(props) {
   if (loading) {
     return <b>Loading</b>;
   }
-
-  console.log(props);
 
   return (
     <div>
@@ -124,6 +132,33 @@ it("Fetches data & re-fetches data using hooks api", () => {
   expect(document.querySelector("#headline").textContent).toBe("hello");
 });
 
+it("Renders to string using hooks api", async () => {
+  let renderCounter = jest.fn();
+  let executeSpy = jest.fn();
+  let client = createClient({ link: link(executeSpy) });
+
+  await client.load({ query: q, variables: { articleId: "hola" } });
+
+  let App = () => {
+    let props = useQuery(q, {
+      variables: { articleId: "hola" }
+    });
+
+    renderCounter(props);
+
+    return <ButtonAndHeadline {...props} />;
+  };
+
+  let str = ReactDOMServer.renderToString(
+    <ArtemisProvider client={client}>
+      <App />
+    </ArtemisProvider>
+  );
+
+  expect(str).toMatchSnapshot();
+  expect(renderCounter.mock.calls).toMatchSnapshot();
+});
+
 it("Fetches data & re-fetches data using legacy hoc", () => {
   let renderCounter = jest.fn();
   let executeSpy = jest.fn();
@@ -172,7 +207,6 @@ it("Fetches data & re-fetches data using the render props api", () => {
     return (
       <Query query={q} variables={{ articleId: "hola" }}>
         {props => {
-          console.log(props, "query y");
           renderCounter(props);
           return <ButtonAndHeadline {...props} data={props.data} />;
         }}
