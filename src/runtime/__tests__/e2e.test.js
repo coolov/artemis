@@ -44,6 +44,28 @@ let mutation = gql`
     }
 `;
 
+function ButtonAndHeadline(props) {
+  let { data, loading, refetch } = props;
+
+  if (loading) {
+    return <b>Loading</b>;
+  }
+
+  console.log(props);
+
+  return (
+    <div>
+      <h1 id="headline">{data.anyWork.headline}</h1>{" "}
+      <button
+        onClick={() => {
+          refetch({ articleId: "hello" });
+        }}
+        id="button"
+      ></button>
+    </div>
+  );
+}
+
 let container = null;
 beforeEach(() => {
   // setup a DOM element as a render target
@@ -65,27 +87,13 @@ it("Fetches data & re-fetches data using hooks api", () => {
   let client = createClient({ link: link(executeSpy) });
 
   let App = () => {
-    let { data, loading, refetch } = useQuery(q, {
+    let props = useQuery(q, {
       variables: { articleId: "hola" }
     });
 
-    renderCounter({ data, loading, refetch });
+    renderCounter(props);
 
-    if (loading) {
-      return <b>Loading</b>;
-    }
-
-    return (
-      <div>
-        <h1 id="headline">{data.anyWork.headline}</h1>{" "}
-        <button
-          onClick={() => {
-            refetch({ articleId: "hello" });
-          }}
-          id="button"
-        ></button>
-      </div>
-    );
+    return <ButtonAndHeadline {...props} />;
   };
 
   act(() => {
@@ -124,17 +132,7 @@ it("Fetches data & re-fetches data using legacy hoc", () => {
 
   const Component = props => {
     renderCounter(props);
-
-    if (props.loading) {
-      return <b>Loading</b>;
-    }
-
-    return (
-      <button
-        onClick={() => props.data.refetch({ articleId: "hello" })}
-        id="button"
-      />
-    );
+    return <ButtonAndHeadline {...props.data} data={props.data} />;
   };
 
   const App = graphql(q, { variables: { articleId: "hola" } })(Component);
@@ -174,13 +172,9 @@ it("Fetches data & re-fetches data using the render props api", () => {
     return (
       <Query query={q} variables={{ articleId: "hola" }}>
         {props => {
+          console.log(props, "query y");
           renderCounter(props);
-          return (
-            <button
-              onClick={() => props.refetch({ articleId: "hello" })}
-              id="button"
-            />
-          );
+          return <ButtonAndHeadline {...props} data={props.data} />;
         }}
       </Query>
     );
@@ -219,17 +213,7 @@ it("mutates data using legacy hoc", () => {
 
   const Component = props => {
     renderCounter(props);
-
-    if (props.loading) {
-      return <b>Loading</b>;
-    }
-
-    return (
-      <button
-        onClick={() => props.data.refetch({ articleId: "hello" })}
-        id="button"
-      />
-    );
+    return null;
   };
 
   const App = graphql(mutation, { variables: { articleId: "hola" } })(

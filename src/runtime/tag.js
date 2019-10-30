@@ -27,6 +27,7 @@ export function gql(strings, ...values) {
   // validate that all references to fragments are
   // at the end of the query. if anything else than
   // references follows the query, throw!
+  // (this is probably not needed)
   for (let i = 1; i < strings.length; i++) {
     // match any whitespace
     if (strings[i].match(/^\s+$/) === null) {

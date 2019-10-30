@@ -27,8 +27,13 @@ Array [
   Array [
     Object {
       "data": null,
+      "error": false,
+      "fetchMore": [Function],
       "loading": true,
       "refetch": [Function],
+      "variables": Object {
+        "articleId": "hola",
+      },
     },
   ],
   Array [
@@ -38,8 +43,13 @@ Array [
           "headline": "hola",
         },
       },
+      "error": false,
+      "fetchMore": [Function],
       "loading": false,
       "refetch": [Function],
+      "variables": Object {
+        "articleId": "hola",
+      },
     },
   ],
 ]
@@ -76,8 +86,13 @@ Array [
           "headline": "hola",
         },
       },
+      "error": false,
+      "fetchMore": [Function],
       "loading": false,
       "refetch": [Function],
+      "variables": Object {
+        "articleId": "hello",
+      },
     },
   ],
   Array [
@@ -87,8 +102,13 @@ Array [
           "headline": "hello",
         },
       },
+      "error": false,
+      "fetchMore": [Function],
       "loading": false,
       "refetch": [Function],
+      "variables": Object {
+        "articleId": "hello",
+      },
     },
   ],
 ]
