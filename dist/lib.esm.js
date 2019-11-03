@@ -72,12 +72,6 @@ function createClient({ link, initialState, ssrMode = false }) {
   };
 }
 
-const shallowCompare = (obj1, obj2) =>
-  Object.keys(obj1).length === Object.keys(obj2).length &&
-  Object.keys(obj1).every(
-    key => obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
-  );
-
 /* eslint-disable kyt/no-props-spread */
 
 const ArtemisContext = createContext();
@@ -149,12 +143,12 @@ function useQuery(query, opts = { variables: {} }) {
 
   // derived state from props
   // https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
-  const [prevVars, setPrevVars] = useState(opts.variables);
+  // const [prevVars, setPrevVars] = useState(opts.variables);
 
-  if (!shallowCompare(opts.variables, prevVars)) {
-    setVariables(opts.variables);
-    setPrevVars(opts.variables);
-  }
+  // if (!shallowCompare(opts.variables, prevVars)) {
+  //   setVariables(opts.variables);
+  //   setPrevVars(opts.variables);
+  // }
 
   const op = useMemo(() => client.createOperation({ query, variables }), [
     query,
