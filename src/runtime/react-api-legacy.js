@@ -54,7 +54,7 @@ export function withApollo(ComposedComponent) {
       throw new Error("Fail!");
     }
   };
-  return props => React.createElement({ ...props, client });
+  return props => React.createElement(ComposedComponent, { ...props, client });
 }
 
 // render props api ugh!!!

@@ -368,7 +368,7 @@ function withApollo(ComposedComponent) {
       throw new Error("Fail!");
     }
   };
-  return props => React__default.createElement({ ...props, client });
+  return props => React__default.createElement(ComposedComponent, { ...props, client });
 }
 
 // render props api ugh!!!
