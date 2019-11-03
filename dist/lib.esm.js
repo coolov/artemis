@@ -1,1 +1,373 @@
-import e,{createContext as r,useContext as t,useState as n,useRef as a,useMemo as o,useReducer as i,useEffect as s}from"react";import u from"zen-observable";function c(e){if(!e.name)throw new Error("The provided operation is missing a name property!");return e.name+JSON.stringify(e.variables)}function l({query:e,variables:r={}}){if("Document"===e.kind)return{name:e.definitions[0].name.value,type:e.definitions[0].operation,kind:e.kind,query:e,variables:r};if("String"===e.kind)return{name:e.name,type:e.type,kind:e.kind,query:e.query,variables:r};throw new TypeError("Unknown Query!")}function f({link:e,initialState:r,ssrMode:t=!1}){const n=function(e){const r=new Map(e);return{get:e=>{const t=c(e);return r.get(t)||null},set:(e,t)=>{const n=c(e);r.set(n,t)},extract:()=>[...r]}}(r),{execute:a}=e;return{execute:a,store:n,ssrMode:t,load:({query:r,variables:t})=>{const a=l({query:r,variables:t});return e.executePromise(a).then(e=>{e.data&&n.set(a,e.data)})},createOperation:l}}const y=(e,r)=>Object.keys(e).length===Object.keys(r).length&&Object.keys(e).every(t=>r.hasOwnProperty(t)&&e[t]===r[t]),d=r();function p(r){const{client:t}=r;return e.createElement(d.Provider,{value:t},r.children)}function b(){return t(d)}function m(e,r){switch(r.type){case"FETCH_INIT":return{...e,loading:r.payload,error:!1};case"FETCH_SUCCESS":return{...e,loading:!1,error:!1,data:r.payload};case"FETCH_FAILURE":return{...e,loading:!1,error:!0};default:throw new Error}}function v(e,r={variables:{}}){r.variables=r.variables||{};const t=b(),[u,c]=n(r.variables),l=a(null),[f,d]=n(r.variables);y(r.variables,f)||(c(r.variables),d(r.variables));const p=o(()=>t.createOperation({query:e,variables:u}),[e,u]),v=t.store.get(p),h=!!v,[g,E]=i(m,{data:v,loading:!v,error:!1});return s(()=>{const e="function"==typeof l.current;if(!h){E({type:"FETCH_INIT",payload:!e});const r=t.execute(p).subscribe({next:r=>{t.store.set(p,r.data);const n=e?l.current(g.data,{fetchMoreResult:r.data}):r.data;l.current=null,E({type:"FETCH_SUCCESS",payload:n})},error:e=>{E({type:"FETCH_FAILURE"})}});return function(){r.unsubscribe()}}},[t,p,h]),{...g,refetch:c,variables:u,fetchMore:({variables:e,updateQuery:r})=>{c(e),l.current=r}}}function h(e,...r){let t=e[0];for(let r=1;r<e.length;r++)if(null===e[r].match(/^\s+$/))throw new Error("Expected Whitespace!");const{type:n,name:a}=function(e){const[r,t,n]=e.split(/^\s*(fragment|query|mutation) (\w*)( |\()/g);return{type:t,name:n}}(t);if("fragment"===n)return[t,r];const o=new Set(function e([r,...t]){return void 0===r?[]:Array.isArray(r)?[...e(r),...e(t)]:[r,...e(t)]}(r));return{type:n,name:a,query:t+" "+Array.from(o).join(" "),kind:"String"}}function g(e,r){return async function(e,r){return r.headers["Content-Type"]="application/json",(await fetch(e,r)).json()}(e.uri,{method:"POST",...e.fetchOptions,headers:e.headers,body:JSON.stringify({variables:r.variables,query:r.query,operationName:r.name})})}function E(e){return{execute:function(e){return r=>new u(t=>(g(e,r).then(e=>{t.next(e),t.complete()}),()=>{}))}(e)}}function w(r,t={}){return n=>a=>{const o=b(),i={ssr:!0,variables:{}},s="function"==typeof t.options?{...i,...t.options(a)}:{...i,...t.options||{}};if("mutation"===o.createOperation({query:r}).type)return e.createElement(n,{...a,mutate:()=>{}});if(o.ssrMode&&!s.ssr)return null;const{data:u,loading:c,error:l,refetch:f}=v(r,s);return e.createElement(n,{...a,data:{loading:c,error:l,refetch:f,...u||{}}})}}function q(){}function S(r){const t={query:async()=>{throw new Error("Fail!")}};return r=>e.createElement({...r,client:t})}function k({query:e,variables:r,children:t}){return t(v(e,{variables:r}))}export{p as ArtemisProvider,k as Query,q as compose,f as createClient,E as executor,h as gql,w as graphql,v as useQuery,S as withApollo};
+import React, { createContext, useContext, useState, useRef, useMemo, useReducer, useEffect } from 'react';
+import Observable from 'zen-observable';
+
+function getCacheKey(op) {
+  if (!op.name) {
+    throw new Error("The provided operation is missing a name property!");
+  }
+  return op.name + JSON.stringify(op.variables);
+}
+
+function createStore(initialState) {
+  const store = new Map(initialState);
+
+  return {
+    get: op => {
+      const key = getCacheKey(op);
+      return store.get(key) || null;
+    },
+    set: (op, data) => {
+      const key = getCacheKey(op);
+      store.set(key, data);
+    },
+    extract: () => {
+      return [...store];
+    }
+  };
+}
+
+function createOperation({ query, variables = {} }) {
+  // query is coming from a gql tag
+  if (query.kind === "Document") {
+    return {
+      name: query.definitions[0].name.value,
+      type: query.definitions[0].operation,
+      kind: query.kind,
+      query,
+      variables
+    };
+  }
+
+  // query is coming from an artemis tag
+  if (query.kind === "String") {
+    return {
+      name: query.name,
+      type: query.type,
+      kind: query.kind,
+      query: query.query,
+      variables
+    };
+  }
+
+  throw new TypeError("Unknown Query!");
+}
+
+function createClient({ link, initialState, ssrMode = false }) {
+  const store = createStore(initialState);
+  const { execute } = link;
+
+  return {
+    execute,
+    store,
+    ssrMode,
+    load: ({ query, variables }) => {
+      const op = createOperation({ query, variables });
+      return link.executePromise(op).then(res => {
+        if (res.data) {
+          store.set(op, res.data);
+        }
+      });
+    },
+    createOperation
+  };
+}
+
+const shallowCompare = (obj1, obj2) =>
+  Object.keys(obj1).length === Object.keys(obj2).length &&
+  Object.keys(obj1).every(
+    key => obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+  );
+
+/* eslint-disable kyt/no-props-spread */
+
+const ArtemisContext = createContext();
+
+function ArtemisProvider(props) {
+  const { client } = props;
+  return React.createElement(
+    ArtemisContext.Provider,
+    {
+      value: client
+    },
+    props.children
+  );
+}
+
+function useArtemisClient() {
+  return useContext(ArtemisContext);
+}
+
+// https://overreacted.io/a-complete-guide-to-useeffect/
+// https://www.robinwieruch.de/react-hooks-fetch-data
+// https://github.com/the-road-to-learn-react/use-data-api/blob/master/src/index.js
+function dataFetchReducer(state, action) {
+  switch (action.type) {
+    case "FETCH_INIT":
+      return { ...state, loading: action.payload, error: false };
+    case "FETCH_SUCCESS":
+      return {
+        ...state,
+        loading: false,
+        error: false,
+        data: action.payload
+      };
+    case "FETCH_FAILURE":
+      return {
+        ...state,
+        loading: false,
+        error: true
+      };
+    default:
+      throw new Error();
+  }
+}
+
+// 1. query	  A GraphQL query document parsed into an AST by graphql-tag.
+// 2. options:
+//    variables	                    An object containing all of the variables your query needs to execute
+//    notifyOnNetworkStatusChange	  Whether updates to the network status or network error should re-render your component. Defaults to false.
+//    fetchPolicy	                  FetchPolicy	How you want your component to interact with the Apollo cache. Defaults to "cache-first".
+//    errorPolicy	                  How you want your component to handle network and GraphQL errors. Defaults to "none", which means we treat GraphQL errors as runtime errors.
+//    ssr	                          Pass in false to skip your query during server-side rendering.
+//    displayName	                  The name of your component to be displayed in React DevTools. Defaults to 'Query'.
+//    skip	                        If skip is true, the query will be skipped entirely. Not available with useLazyQuery.
+//    onCompleted	                  A callback executed once your query successfully completes.
+//    onError                       A callback executed in the event of an error.
+//    context	                      Shared context between your component and your network interface (Apollo Link). Useful for setting headers from props or sending information to the request function of Apollo Boost.
+//    client	                      ApolloClient	An ApolloClient instance. By default useQuery / Query uses the client passed down via context, but a different client can be passed in.
+// returns:
+// { data, loading, error, variables, networkStatus, refetch, fetchMore, updateQuery }
+function useQuery(query, opts = { variables: {} }) {
+  // todo, assert in tests that ignoring variables doesn't blow up the test
+  opts.variables = opts.variables || {};
+
+  const client = useArtemisClient();
+  const [variables, setVariables] = useState(opts.variables);
+
+  // use to hold an `update data` function provided by `fetchMore`
+  const updateQueryRef = useRef(null);
+
+  // derived state from props
+  // https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
+  const [prevVars, setPrevVars] = useState(opts.variables);
+
+  if (!shallowCompare(opts.variables, prevVars)) {
+    setVariables(opts.variables);
+    setPrevVars(opts.variables);
+  }
+
+  const op = useMemo(() => client.createOperation({ query, variables }), [
+    query,
+    variables
+  ]);
+
+  // first hit the cache (runs on init and on state change)
+  const initialCacheHit = client.store.get(op);
+  const hasData = !!initialCacheHit;
+
+  const [state, dispatch] = useReducer(dataFetchReducer, {
+    data: initialCacheHit,
+    // default loading state to true if there is no initial cache
+    // hit and if the query is not defered
+    loading:  !initialCacheHit,
+    error: false
+  });
+
+  useEffect(() => {
+    const isUpdate = typeof updateQueryRef.current === "function";
+
+    // immdiately start loading the query if it's not in cache
+    if (!hasData) {
+      dispatch({ type: "FETCH_INIT", payload: !isUpdate }); // < --- payload here is a true false value, clean this up
+
+      const sub = client.execute(op).subscribe({
+        next: result => {
+          client.store.set(op, result.data);
+
+          // if it's availible, use the updateQuery function from `fetchMore`
+          // to merge in more data
+          const payload = isUpdate
+            ? updateQueryRef.current(state.data, {
+                fetchMoreResult: result.data
+              })
+            : result.data;
+
+          updateQueryRef.current = null;
+          dispatch({ type: "FETCH_SUCCESS", payload });
+        },
+        error: error => {
+          dispatch({ type: "FETCH_FAILURE" });
+        }
+      });
+
+      return function cleanup() {
+        sub.unsubscribe();
+      };
+    }
+  }, [client, op, hasData]);
+
+  // what happens after set variables?
+  return {
+    ...state,
+    refetch: setVariables,
+    variables,
+    fetchMore: ({ variables, updateQuery }) => {
+      setVariables(variables);
+      updateQueryRef.current = updateQuery;
+    }
+  };
+}
+
+function parseQuery(str) {
+  const [_, type, name] = str.split(
+    /^\s*(fragment|query|mutation) (\w*)( |\()/g
+  );
+
+  return { type, name };
+}
+
+// this is to flatten the nested fragments
+// todo: optimize this
+// https://medium.com/dailyjs/functional-js-with-es6-recursive-patterns-b7d0813ef9e3
+function flatten([x, ...xs]) {
+  if (typeof x === "undefined") {
+    return [];
+  }
+
+  if (Array.isArray(x)) {
+    return [...flatten(x), ...flatten(xs)];
+  }
+
+  return [x, ...flatten(xs)];
+}
+
+function gql(strings, ...values) {
+  let literal = strings[0];
+
+  // validate that all references to fragments are
+  // at the end of the query. if anything else than
+  // references follows the query, throw!
+  // (this is probably not needed)
+  for (let i = 1; i < strings.length; i++) {
+    // match any whitespace
+    if (strings[i].match(/^\s+$/) === null) {
+      // todo: improve this error message!
+      throw new Error("Expected Whitespace!");
+    }
+  }
+
+  const { type, name } = parseQuery(literal);
+
+  if (type === "fragment") {
+    // builds a tree of nested fragments
+    return [literal, values];
+  }
+
+  // flatten the fragments, then deupe them
+  const fragmentSet = new Set(flatten(values));
+
+  const query = literal + " " + Array.from(fragmentSet).join(" ");
+
+  return { type, name, query, kind: "String" };
+}
+
+async function fetchJSON(url, opts) {
+  opts.headers["Content-Type"] = "application/json";
+  let res = await fetch(url, opts);
+  return res.json();
+}
+
+function queryGQL(options, operation) {
+  return fetchJSON(options.uri, {
+    method: "POST",
+    ...options.fetchOptions,
+    headers: options.headers,
+    body: JSON.stringify({
+      variables: operation.variables,
+      query: operation.query,
+      operationName: operation.name
+    })
+  });
+}
+
+function createExecutor(options) {
+  return op =>
+    new Observable(observer => {
+      queryGQL(options, op).then(res => {
+        observer.next(res);
+        observer.complete();
+      });
+
+      // cancel somehow?
+      return () => {};
+    });
+}
+
+function executor(options) {
+  const execute = createExecutor(options);
+  return { execute };
+}
+
+// https://www.apollographql.com/docs/react/api/react-hoc/#graphqlquery-configcomponent
+// graphql(query, [config])(component)
+// 1. query
+// 2. config
+//      options: {} || props =>
+//      name:     https://www.apollographql.com/docs/react/api/react-hoc/#configname
+function graphql(query, config = {}) {
+  return ComposedComponent => {
+    return props => {
+      const client = useArtemisClient();
+
+      const defaultOptions = { ssr: true, variables: {} };
+      const options =
+        // eslint-disable-next-line no-nested-ternary
+        typeof config.options === "function"
+          ? { ...defaultOptions, ...config.options(props) }
+          : { ...defaultOptions, ...(config.options || {}) };
+
+      // for now, return early on mutations
+      // todo: implement them!!!
+      if (client.createOperation({ query }).type === "mutation") {
+        return React.createElement(ComposedComponent, {
+          ...props,
+          mutate: () => {}
+        });
+      }
+
+      if (client.ssrMode && !options.ssr) {
+        return null;
+      }
+
+      const { data, loading, error, refetch } = useQuery(query, options);
+
+      return React.createElement(ComposedComponent, {
+        ...props,
+        data: { loading, error, refetch, ...(data || {}) }
+      });
+    };
+  };
+}
+
+// uses recompose
+// https://github.com/acdlite/recompose/blob/master/docs/API.md#compose
+function compose() {}
+
+// https://www.apollographql.com/docs/react/api/react-apollo/#withApollo
+// withApollo(component)
+function withApollo(ComposedComponent) {
+  const client = {
+    query: async () => {
+      throw new Error("Fail!");
+    }
+  };
+  return props => React.createElement({ ...props, client });
+}
+
+// render props api ugh!!!
+// <Query query={GET_DOGS}>{({ loading, error, data }) => { return <MyComponent/> }}</Query>
+function Query({ query, variables, children }) {
+  return children(useQuery(query, { variables }));
+}
+
+export { ArtemisProvider, Query, compose, createClient, executor, gql, graphql, useQuery, withApollo };

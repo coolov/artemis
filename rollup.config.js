@@ -7,6 +7,6 @@ export default {
     { file: __dirname + "/dist/lib.cjs.js", format: "cjs" },
     { file: __dirname + "/dist/lib.esm.js", format: "es" }
   ],
-  external: ["react", "zen-observable"],
-  plugins: [terser()]
+  external: ["react", "zen-observable"]
+  // plugins: [terser()]
 };
