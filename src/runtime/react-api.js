@@ -83,12 +83,12 @@ export function useQuery(query, opts = { variables: {} }) {
 
   // derived state from props
   // https://reactjs.org/docs/hooks-faq.html#how-do-i-implement-getderivedstatefromprops
-  const [prevVars, setPrevVars] = useState(opts.variables);
+  // const [prevVars, setPrevVars] = useState(opts.variables);
 
-  if (!shallowCompare(opts.variables, prevVars)) {
-    setVariables(opts.variables);
-    setPrevVars(opts.variables);
-  }
+  // if (!shallowCompare(opts.variables, prevVars)) {
+  //   setVariables(opts.variables);
+  //   setPrevVars(opts.variables);
+  // }
 
   const op = useMemo(() => client.createOperation({ query, variables }), [
     query,
