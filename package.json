@@ -8,7 +8,7 @@
     "dist/*"
   ],
   "scripts": {
-    "test": "npx jest --watch",
+    "test": "npx jest",
     "build": "rollup -c"
   },
   "repository": {
